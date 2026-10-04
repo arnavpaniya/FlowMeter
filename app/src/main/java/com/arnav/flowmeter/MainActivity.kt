@@ -57,8 +57,13 @@ fun FlowMeterApp() {
                 onNotificationsClick = { selectedTab = NavigationTab.ALERTS },
                 onSettingsClick = { selectedTab = NavigationTab.SETTINGS }
             )
-            NavigationTab.ALERTS -> AlertsScreen()
-            NavigationTab.SETTINGS -> SettingsScreen()
+            NavigationTab.ALERTS -> AlertsScreen(
+                onNotificationsClick = { selectedTab = NavigationTab.ALERTS },
+                onSettingsClick = { selectedTab = NavigationTab.SETTINGS }
+            )
+            NavigationTab.SETTINGS -> SettingsScreen(
+                onNotificationsClick = { selectedTab = NavigationTab.ALERTS }
+            )
         }
 
         // Floating Bottom Navigation Bar

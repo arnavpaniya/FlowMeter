@@ -56,6 +56,8 @@ import com.arnav.flowmeter.components.icons.MoreVertIcon
 import com.arnav.flowmeter.components.icons.PieChartIcon
 import com.arnav.flowmeter.components.icons.WaterDropIcon
 import com.arnav.flowmeter.components.status.StatusChip
+import com.arnav.flowmeter.components.waves.CardAmbientWaveOverlay
+import com.arnav.flowmeter.components.waves.EnhancedLuminousWaves
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -1023,3 +1025,316 @@ private fun DistributionLegendRow(
         )
     }
 }
+
+/**
+ * Main Status Card on Alerts screen with concentric glowing shield and serene water waves.
+ */
+@Composable
+fun MainAlertStatusCard(
+    modifier: Modifier = Modifier
+) {
+    FlowMeterCard(
+        modifier = modifier.fillMaxWidth(),
+        cornerRadius = 24.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Concentric Glowing Shield Icon Container
+            Box(
+                modifier = Modifier.size(140.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    val w = size.width
+                    val h = size.height
+                    val center = Offset(w / 2f, h / 2f)
+
+                    // Outer ring
+                    drawCircle(
+                        color = Color(0x1F00A3FF),
+                        radius = (w / 2f) - 6.dp.toPx(),
+                        center = center,
+                        style = Stroke(width = 1.dp.toPx())
+                    )
+                    // Middle glowing ring
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color(0x3300A3FF),
+                                Color(0x1438BDF8),
+                                Color(0x00000000)
+                            ),
+                            center = center,
+                            radius = (w / 2f) - 18.dp.toPx()
+                        ),
+                        radius = (w / 2f) - 18.dp.toPx(),
+                        center = center
+                    )
+                    drawCircle(
+                        color = Color(0x4038BDF8),
+                        radius = (w / 2f) - 18.dp.toPx(),
+                        center = center,
+                        style = Stroke(width = 1.2.dp.toPx())
+                    )
+                    // Inner filled disk
+                    drawCircle(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF13233C),
+                                Color(0xFF0F1A2C)
+                            )
+                        ),
+                        radius = (w / 2f) - 30.dp.toPx(),
+                        center = center
+                    )
+                    drawCircle(
+                        color = Color(0x6600A3FF),
+                        radius = (w / 2f) - 30.dp.toPx(),
+                        center = center,
+                        style = Stroke(width = 1.5.dp.toPx())
+                    )
+                }
+
+                // Shield Icon in center
+                com.arnav.flowmeter.components.icons.ShieldCheckIcon(
+                    size = 38.dp,
+                    tint = FlowMeterColors.CyanAccent
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Wave overlay behind text
+            CardAmbientWaveOverlay(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                height = 36.dp
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "No active alerts",
+                style = FlowMeterTypography.GreetingName.copy(fontSize = 20.sp),
+                color = FlowMeterColors.TextPrimary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Everything looks normal for now.",
+                style = FlowMeterTypography.CardFooterText.copy(
+                    fontSize = 13.sp,
+                    color = FlowMeterColors.TextSecondary
+                )
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = "We'll notify you if there are any unusual\nwater usage patterns.",
+                style = FlowMeterTypography.CardFooterText.copy(
+                    fontSize = 13.sp,
+                    color = FlowMeterColors.TextSecondary
+                ),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                lineHeight = 18.sp
+            )
+        }
+    }
+}
+
+/**
+ * Recent Alerts Section List Card.
+ */
+@Composable
+fun RecentAlertsCard(
+    modifier: Modifier = Modifier,
+    onViewAllClick: () -> Unit = {}
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Section Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Recent Alerts",
+                style = FlowMeterTypography.GreetingName.copy(fontSize = 18.sp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onViewAllClick)
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "View all",
+                    style = FlowMeterTypography.CardFooterText.copy(
+                        color = FlowMeterColors.CyanAccent,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                        fontSize = 13.sp
+                    )
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                ChevronRightIcon(size = 13.dp, tint = FlowMeterColors.CyanAccent)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // List Container Card
+        FlowMeterCard(
+            modifier = Modifier.fillMaxWidth(),
+            cornerRadius = 22.dp
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                AlertCategoryRow(
+                    icon = { WaterDropIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
+                    title = "No alerts yet",
+                    subtitle = "You'll see high usage alerts here"
+                )
+                AlertDivider()
+                AlertCategoryRow(
+                    icon = { com.arnav.flowmeter.components.icons.TrendingFlowIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
+                    title = "No alerts yet",
+                    subtitle = "You'll see unusual flow alerts here"
+                )
+                AlertDivider()
+                AlertCategoryRow(
+                    icon = { DeviceSensorIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
+                    title = "No alerts yet",
+                    subtitle = "You'll see device alerts here"
+                )
+                AlertDivider()
+                AlertCategoryRow(
+                    icon = { com.arnav.flowmeter.components.icons.ThermometerIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
+                    title = "No alerts yet",
+                    subtitle = "You'll see temperature alerts here"
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AlertCategoryRow(
+    icon: @Composable () -> Unit,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(color = FlowMeterColors.CyanAccent.copy(alpha = 0.2f)),
+                onClick = onClick
+            )
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(FlowMeterColors.DarkBlueIconBg),
+                contentAlignment = Alignment.Center
+            ) {
+                icon()
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = title,
+                    style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 14.sp)
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = subtitle,
+                    style = FlowMeterTypography.CardFooterText.copy(
+                        fontSize = 12.sp,
+                        color = FlowMeterColors.TextSecondary
+                    )
+                )
+            }
+        }
+
+        ChevronRightIcon(size = 14.dp, tint = FlowMeterColors.TextSecondary)
+    }
+}
+
+@Composable
+private fun AlertDivider() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 48.dp)
+            .height(1.dp)
+            .background(Color(0x1438BDF8))
+    )
+}
+
+/**
+ * Bottom Information Card about future alerts.
+ */
+@Composable
+fun AlertInfoCard(
+    modifier: Modifier = Modifier
+) {
+    FlowMeterCard(
+        modifier = modifier.fillMaxWidth(),
+        cornerRadius = 20.dp
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(FlowMeterColors.DarkBlueIconBg),
+                contentAlignment = Alignment.Center
+            ) {
+                com.arnav.flowmeter.components.icons.LightbulbIcon(
+                    size = 20.dp,
+                    tint = FlowMeterColors.CyanAccent
+                )
+            }
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "You'll get alerts for",
+                    style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 14.sp)
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    text = "High flow, unusual usage, device issues and more once your device is connected.",
+                    style = FlowMeterTypography.CardFooterText.copy(
+                        fontSize = 11.sp,
+                        color = FlowMeterColors.TextSecondary,
+                        lineHeight = 15.sp
+                    )
+                )
+            }
+        }
+    }
+}
+
