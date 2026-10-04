@@ -28,11 +28,11 @@ import com.arnav.flowmeter.components.cards.CurrentFlowCard
 import com.arnav.flowmeter.components.cards.DeviceConnectionCard
 import com.arnav.flowmeter.components.cards.SummaryMetricCard
 import com.arnav.flowmeter.components.cards.TotalRuntimeCard
-import com.arnav.flowmeter.components.cards.TranslucentWaveRibbons
 import com.arnav.flowmeter.components.icons.BellIcon
 import com.arnav.flowmeter.components.icons.HistoryIcon
 import com.arnav.flowmeter.components.icons.SettingsGearIcon
 import com.arnav.flowmeter.components.icons.WaterDropIcon
+import com.arnav.flowmeter.components.waves.EnhancedLuminousWaves
 
 @Composable
 fun HomeScreen(

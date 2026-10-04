@@ -30,7 +30,6 @@ import com.arnav.flowmeter.branding.typography.FlowMeterTypography
 import com.arnav.flowmeter.components.buttons.CircularIconButton
 import com.arnav.flowmeter.components.buttons.TimeRangeSelector
 import com.arnav.flowmeter.components.cards.AnalyticsMetricCard
-import com.arnav.flowmeter.components.cards.TranslucentWaveRibbons
 import com.arnav.flowmeter.components.cards.UsageDistributionCard
 import com.arnav.flowmeter.components.cards.WaterUsageChartCard
 import com.arnav.flowmeter.components.icons.AnalyticsNavIcon
@@ -39,6 +38,7 @@ import com.arnav.flowmeter.components.icons.HistoryIcon
 import com.arnav.flowmeter.components.icons.SettingsGearIcon
 import com.arnav.flowmeter.components.icons.UpArrowIcon
 import com.arnav.flowmeter.components.icons.WaterDropIcon
+import com.arnav.flowmeter.components.waves.EnhancedLuminousWaves
 
 @Composable
 fun AnalyticsScreen(
