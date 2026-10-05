@@ -34,6 +34,7 @@ import com.arnav.flowmeter.components.cards.RecentAlertsCard
 import com.arnav.flowmeter.components.icons.BellIcon
 import com.arnav.flowmeter.components.icons.SettingsGearIcon
 import com.arnav.flowmeter.components.waves.EnhancedLuminousWaves
+import com.arnav.flowmeter.components.waves.HeaderAtmosphericWaves
 
 @Composable
 fun AlertsScreen(
@@ -57,81 +58,79 @@ fun AlertsScreen(
                 .statusBarsPadding()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 100.dp) // Clearance for floating bottom navbar
+                .padding(bottom = 130.dp) // Clearance for floating bottom navbar
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // TOP HEADER: Brand Logo + Action Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FlowMeterLogo(
-                        size = 34.dp,
-                        showContainer = false
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = "FlowMeter",
-                        style = FlowMeterTypography.AppBrandTitle
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularIconButton(
-                        icon = {
-                            BellIcon(
-                                size = 18.dp,
-                                tint = FlowMeterColors.TextSecondary,
-                                hasNotificationDot = true
-                            )
-                        },
-                        size = 38.dp,
-                        onClick = onNotificationsClick
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    CircularIconButton(
-                        icon = { SettingsGearIcon(size = 18.dp, tint = FlowMeterColors.TextSecondary) },
-                        size = 38.dp,
-                        onClick = onSettingsClick
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // MAIN TITLE WITH AMBIENT WATER WAVES
+            // TOP HEADER: Brand Logo + Action Buttons with Atmospheric Wave Background
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Background translucent flowing wave ribbon with particles
-                EnhancedLuminousWaves(
+                HeaderAtmosphericWaves(
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterEnd),
-                    height = 80.dp,
-                    showParticles = true
+                    height = 50.dp
                 )
 
-                Column(
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "Alerts",
-                        style = FlowMeterTypography.GreetingName
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Stay informed about your water usage",
-                        style = FlowMeterTypography.GreetingSubtext
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FlowMeterLogo(
+                            size = 36.dp,
+                            showContainer = true
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "FlowMeter",
+                            style = FlowMeterTypography.AppBrandTitle
+                        )
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularIconButton(
+                            icon = {
+                                BellIcon(
+                                    size = 18.dp,
+                                    tint = FlowMeterColors.TextSecondary,
+                                    hasNotificationDot = true
+                                )
+                            },
+                            size = 38.dp,
+                            onClick = onNotificationsClick
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        CircularIconButton(
+                            icon = { SettingsGearIcon(size = 18.dp, tint = FlowMeterColors.TextSecondary) },
+                            size = 38.dp,
+                            onClick = onSettingsClick
+                        )
+                    }
                 }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // MAIN TITLE (Unobstructed, crisp typography)
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Alerts",
+                    style = FlowMeterTypography.GreetingName
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Stay informed about your water usage",
+                    style = FlowMeterTypography.GreetingSubtext
+                )
             }
 
             Spacer(modifier = Modifier.height(20.dp))

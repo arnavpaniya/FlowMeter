@@ -4,6 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +28,7 @@ import com.arnav.flowmeter.screens.alerts.AlertsScreen
 import com.arnav.flowmeter.screens.analytics.AnalyticsScreen
 import com.arnav.flowmeter.screens.home.HomeScreen
 import com.arnav.flowmeter.screens.settings.SettingsScreen
+import com.arnav.flowmeter.screens.splash.SplashScreen
 import com.arnav.flowmeter.ui.theme.FlowMeterTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,8 +37,29 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FlowMeterTheme {
-                FlowMeterApp()
+                FlowMeterRoot()
             }
+        }
+    }
+}
+
+@Composable
+fun FlowMeterRoot() {
+    var isSplashVisible by remember { mutableStateOf(true) }
+
+    AnimatedContent(
+        targetState = isSplashVisible,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
+        },
+        label = "SplashToMainTransition"
+    ) { showSplash ->
+        if (showSplash) {
+            SplashScreen(
+                onSplashFinished = { isSplashVisible = false }
+            )
+        } else {
+            FlowMeterApp()
         }
     }
 }

@@ -35,7 +35,7 @@ fun DeviceScreen(
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 100.dp)
+                .padding(bottom = 130.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 

@@ -33,6 +33,7 @@ import com.arnav.flowmeter.components.icons.HistoryIcon
 import com.arnav.flowmeter.components.icons.SettingsGearIcon
 import com.arnav.flowmeter.components.icons.WaterDropIcon
 import com.arnav.flowmeter.components.waves.EnhancedLuminousWaves
+import com.arnav.flowmeter.components.waves.HeaderAtmosphericWaves
 
 @Composable
 fun HomeScreen(
@@ -54,82 +55,81 @@ fun HomeScreen(
                 .statusBarsPadding()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 100.dp) // Leave room for floating bottom bar
+                .padding(bottom = 120.dp) // Leave room for floating clay bottom bar
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // TOP HEADER: Logo + Wordmark and Action Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // FlowMeter Logo + Brand Title
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FlowMeterLogo(
-                        size = 34.dp,
-                        showContainer = false
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = "FlowMeter",
-                        style = FlowMeterTypography.AppBrandTitle
-                    )
-                }
-
-                // Right Actions: Notification & Settings
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularIconButton(
-                        icon = { BellIcon(size = 18.dp, tint = FlowMeterColors.TextSecondary) },
-                        size = 38.dp,
-                        onClick = onNotificationsClick
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    CircularIconButton(
-                        icon = { SettingsGearIcon(size = 18.dp, tint = FlowMeterColors.TextSecondary) },
-                        size = 38.dp,
-                        onClick = onSettingsClick
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // GREETING SECTION WITH BACKGROUND WATER WAVES
+            // TOP HEADER: Logo + Wordmark and Action Buttons with Atmospheric Wave Background
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Background luminous flowing wave ribbons with particles
-                com.arnav.flowmeter.components.waves.EnhancedLuminousWaves(
+                // Background subtle atmospheric flowing waves in top right
+                HeaderAtmosphericWaves(
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterEnd),
-                    height = 90.dp,
-                    showParticles = true
+                    height = 50.dp
                 )
 
-                Column(
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "Good morning,",
-                        style = FlowMeterTypography.GreetingSmall
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Arnav 👋",
-                        style = FlowMeterTypography.GreetingName
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Here's your water usage overview",
-                        style = FlowMeterTypography.GreetingSubtext
-                    )
+                    // FlowMeter Logo + Brand Title
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FlowMeterLogo(
+                            size = 36.dp,
+                            showContainer = true
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "FlowMeter",
+                            style = FlowMeterTypography.AppBrandTitle
+                        )
+                    }
+
+                    // Right Actions: Notification & Settings
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularIconButton(
+                            icon = { BellIcon(size = 18.dp, tint = FlowMeterColors.TextSecondary) },
+                            size = 38.dp,
+                            onClick = onNotificationsClick
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        CircularIconButton(
+                            icon = { SettingsGearIcon(size = 18.dp, tint = FlowMeterColors.TextSecondary) },
+                            size = 38.dp,
+                            onClick = onSettingsClick
+                        )
+                    }
                 }
+            }
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            // GREETING SECTION (Unobstructed, crisp typography)
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Good morning,",
+                    style = FlowMeterTypography.GreetingSmall
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Arnav 👋",
+                    style = FlowMeterTypography.GreetingName
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Here's your water usage overview",
+                    style = FlowMeterTypography.GreetingSubtext
+                )
             }
 
             Spacer(modifier = Modifier.height(22.dp))

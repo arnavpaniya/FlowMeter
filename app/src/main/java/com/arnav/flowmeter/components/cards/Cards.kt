@@ -154,7 +154,7 @@ fun TranslucentWaveRibbons(
 }
 
 /**
- * Small decorative animated wave graphic for metric cards with smooth shimmer.
+ * Small decorative animated wave graphic for metric cards with smooth shimmer and translucent fill.
  */
 @Composable
 fun MetricWaveGraphic(
@@ -166,7 +166,7 @@ fun MetricWaveGraphic(
         initialValue = 0f,
         targetValue = (2 * Math.PI).toFloat(),
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 5000, easing = LinearEasing),
+            animation = tween(durationMillis = 4500, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "metric_wave_phase"
@@ -180,14 +180,46 @@ fun MetricWaveGraphic(
         val w = size.width
         val h = size.height
 
-        val path = Path()
-        path.moveTo(0f, h * 0.5f)
+        // Area fill under wave
+        val fillPath = Path()
+        fillPath.moveTo(0f, h)
         var x = 0f
-        val step = 4f
+        val step = 3f
         while (x <= w) {
             val progress = x / w
-            val y = (h * 0.5f) + (sin((progress * 2.5 * Math.PI) + phase).toFloat() * (h * 0.28f))
-            path.lineTo(x, y)
+            val y = (h * 0.48f) + (sin((progress * 2.5 * Math.PI) + phase).toFloat() * (h * 0.28f))
+            fillPath.lineTo(x, y)
+            x += step
+        }
+        fillPath.lineTo(w, h)
+        fillPath.close()
+
+        drawPath(
+            path = fillPath,
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color(0x3300A3FF),
+                    Color(0x080284C7),
+                    Color.Transparent
+                ),
+                startY = 0f,
+                endY = h
+            )
+        )
+
+        // Crest stroke
+        val path = Path()
+        x = 0f
+        var isFirst = true
+        while (x <= w) {
+            val progress = x / w
+            val y = (h * 0.48f) + (sin((progress * 2.5 * Math.PI) + phase).toFloat() * (h * 0.28f))
+            if (isFirst) {
+                path.moveTo(x, y)
+                isFirst = false
+            } else {
+                path.lineTo(x, y)
+            }
             x += step
         }
 
@@ -195,10 +227,10 @@ fun MetricWaveGraphic(
             path = path,
             brush = Brush.horizontalGradient(
                 colors = listOf(
-                    Color(0x1A00A3FF),
+                    Color(0x2200A3FF),
                     Color(0x9938BDF8),
-                    Color(0xFF00E5FF),
-                    Color(0x3300A3FF)
+                    Color(0xFF00F5D4),
+                    Color(0x4038BDF8)
                 )
             ),
             style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
