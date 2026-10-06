@@ -933,3 +933,102 @@ fun ShieldSecurityIcon(
         drawCircle(color = tint, radius = strokeWidth * 0.8f, center = Offset(w * 0.5f, h * 0.48f))
     }
 }
+
+@Composable
+fun ChevronLeftIcon(
+    modifier: Modifier = Modifier,
+    size: Dp = 18.dp,
+    tint: Color = FlowMeterColors.TextPrimary
+) {
+    Canvas(modifier = modifier.size(size)) {
+        val w = this.size.width
+        val h = this.size.height
+        val strokeWidth = w * 0.12f
+
+        val path = Path().apply {
+            moveTo(w * 0.65f, h * 0.20f)
+            lineTo(w * 0.35f, h * 0.50f)
+            lineTo(w * 0.65f, h * 0.80f)
+        }
+        drawPath(path = path, color = tint, style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    }
+}
+
+@Composable
+fun ArrowBackIcon(
+    modifier: Modifier = Modifier,
+    size: Dp = 20.dp,
+    tint: Color = FlowMeterColors.TextPrimary
+) {
+    Canvas(modifier = modifier.size(size)) {
+        val w = this.size.width
+        val h = this.size.height
+        val strokeWidth = w * 0.10f
+
+        // Stem
+        drawLine(
+            color = tint,
+            start = Offset(w * 0.25f, h * 0.5f),
+            end = Offset(w * 0.85f, h * 0.5f),
+            strokeWidth = strokeWidth,
+            cap = StrokeCap.Round
+        )
+
+        // Arrowhead
+        val head = Path().apply {
+            moveTo(w * 0.50f, h * 0.25f)
+            lineTo(w * 0.25f, h * 0.50f)
+            lineTo(w * 0.50f, h * 0.75f)
+        }
+        drawPath(path = head, color = tint, style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    }
+}
+
+@Composable
+fun CheckmarkIcon(
+    modifier: Modifier = Modifier,
+    size: Dp = 16.dp,
+    tint: Color = FlowMeterColors.CyanAccent
+) {
+    Canvas(modifier = modifier.size(size)) {
+        val w = this.size.width
+        val h = this.size.height
+        val strokeWidth = w * 0.12f
+
+        val checkPath = Path().apply {
+            moveTo(w * 0.20f, h * 0.50f)
+            lineTo(w * 0.42f, h * 0.75f)
+            lineTo(w * 0.82f, h * 0.25f)
+        }
+        drawPath(path = checkPath, color = tint, style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    }
+}
+
+@Composable
+fun CloseIcon(
+    modifier: Modifier = Modifier,
+    size: Dp = 16.dp,
+    tint: Color = FlowMeterColors.TextSecondary
+) {
+    Canvas(modifier = modifier.size(size)) {
+        val w = this.size.width
+        val h = this.size.height
+        val strokeWidth = w * 0.12f
+
+        drawLine(
+            color = tint,
+            start = Offset(w * 0.25f, h * 0.25f),
+            end = Offset(w * 0.75f, h * 0.75f),
+            strokeWidth = strokeWidth,
+            cap = StrokeCap.Round
+        )
+        drawLine(
+            color = tint,
+            start = Offset(w * 0.75f, h * 0.25f),
+            end = Offset(w * 0.25f, h * 0.75f),
+            strokeWidth = strokeWidth,
+            cap = StrokeCap.Round
+        )
+    }
+}
+

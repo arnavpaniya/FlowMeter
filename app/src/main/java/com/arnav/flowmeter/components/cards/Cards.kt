@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,12 +53,15 @@ import com.arnav.flowmeter.components.icons.ClockIcon
 import com.arnav.flowmeter.components.icons.DeviceSensorIcon
 import com.arnav.flowmeter.components.icons.FlowWavesIcon
 import com.arnav.flowmeter.components.icons.HistoryIcon
-import com.arnav.flowmeter.components.icons.MoreVertIcon
 import com.arnav.flowmeter.components.icons.PieChartIcon
+import com.arnav.flowmeter.components.icons.ShieldCheckIcon
+import com.arnav.flowmeter.components.icons.ThermometerIcon
+import com.arnav.flowmeter.components.icons.TrendingFlowIcon
 import com.arnav.flowmeter.components.icons.WaterDropIcon
 import com.arnav.flowmeter.components.status.StatusChip
+import com.arnav.flowmeter.components.status.TelemetryDataType
+import com.arnav.flowmeter.components.status.TelemetryTagChip
 import com.arnav.flowmeter.components.waves.CardAmbientWaveOverlay
-import com.arnav.flowmeter.components.waves.EnhancedLuminousWaves
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -68,88 +72,39 @@ import kotlin.math.sin
 fun FlowMeterCard(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 22.dp,
+    onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(cornerRadius))
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        FlowMeterColors.CardSurface,
-                        FlowMeterColors.CardBackground
-                    )
+    val baseModifier = modifier
+        .clip(RoundedCornerShape(cornerRadius))
+        .background(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    FlowMeterColors.CardSurface,
+                    FlowMeterColors.CardBackground
                 )
             )
-            .border(
-                width = 1.dp,
-                brush = FlowMeterColors.CardBorderBrush,
-                shape = RoundedCornerShape(cornerRadius)
-            )
-            .padding(16.dp)
+        )
+        .border(
+            width = 1.dp,
+            brush = FlowMeterColors.CardBorderBrush,
+            shape = RoundedCornerShape(cornerRadius)
+        )
+
+    val finalModifier = if (onClick != null) {
+        baseModifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = ripple(color = FlowMeterColors.CyanAccent.copy(alpha = 0.18f)),
+            onClick = onClick
+        )
+    } else {
+        baseModifier
+    }
+
+    Box(
+        modifier = finalModifier.padding(16.dp)
     ) {
         content()
-    }
-}
-
-/**
- * Luminous flowing water wave ribbon animation for ambient visual richness.
- */
-@Composable
-fun TranslucentWaveRibbons(
-    modifier: Modifier = Modifier,
-    height: Dp = 60.dp,
-    waveColor1: Color = Color(0x3300A3FF),
-    waveColor2: Color = Color(0x2238BDF8)
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "wave_anim")
-    val phase by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = (2 * Math.PI).toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 6000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "phase"
-    )
-
-    Canvas(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height)
-    ) {
-        val w = size.width
-        val h = size.height
-
-        // First ribbon wave
-        val path1 = Path()
-        path1.moveTo(0f, h * 0.5f)
-        var x = 0f
-        while (x <= w) {
-            val y = (h * 0.5f) + (sin((x / w * 2.5 * Math.PI) + phase).toFloat() * (h * 0.28f))
-            path1.lineTo(x, y)
-            x += 10f
-        }
-        drawPath(
-            path = path1,
-            color = waveColor1,
-            style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
-        )
-
-        // Second translucent layer wave
-        val path2 = Path()
-        path2.moveTo(0f, h * 0.6f)
-        x = 0f
-        while (x <= w) {
-            val y = (h * 0.6f) + (cos((x / w * 2.0 * Math.PI) - phase).toFloat() * (h * 0.22f))
-            path2.lineTo(x, y)
-            x += 10f
-        }
-        drawPath(
-            path = path2,
-            color = waveColor2,
-            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
-        )
     }
 }
 
@@ -244,7 +199,9 @@ fun MetricWaveGraphic(
 @Composable
 fun CircularFlowGauge(
     modifier: Modifier = Modifier,
-    size: Dp = 160.dp
+    size: Dp = 160.dp,
+    value: String = "—",
+    unit: String = "L/min"
 ) {
     Box(
         modifier = modifier.size(size),
@@ -308,12 +265,12 @@ fun CircularFlowGauge(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "—",
+                text = value,
                 style = FlowMeterTypography.MetricPlaceholderLarge.copy(fontSize = 38.sp)
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "L/min",
+                text = unit,
                 style = FlowMeterTypography.UnitLabel
             )
         }
@@ -365,16 +322,17 @@ fun DateDropdownChip(
 }
 
 /**
- * Main Current-Flow Card matching reference layout with compact intentional empty state.
+ * Main Current-Flow Monitoring Card with tap-to-detail interaction.
  */
 @Composable
 fun CurrentFlowCard(
     modifier: Modifier = Modifier,
-    onMoreClick: () -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
     FlowMeterCard(
         modifier = modifier.fillMaxWidth(),
-        cornerRadius = 24.dp
+        cornerRadius = 24.dp,
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -397,23 +355,24 @@ fun CurrentFlowCard(
                         FlowWavesIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent)
                     }
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = "Current Flow",
-                        style = FlowMeterTypography.CardHeaderTitle
-                    )
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Current Flow",
+                                style = FlowMeterTypography.CardHeaderTitle
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            TelemetryTagChip(type = TelemetryDataType.MEASURED)
+                        }
+                    }
                 }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StatusChip(text = "Waiting for data")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier.size(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        MoreVertIcon(size = 18.dp, tint = FlowMeterColors.TextSecondary)
-                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    ChevronRightIcon(size = 14.dp, tint = FlowMeterColors.TextSecondary)
                 }
             }
 
@@ -441,10 +400,10 @@ fun CurrentFlowCard(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Connect your device to start monitoring",
+                    text = "Tap to view flow dynamics & statistics",
                     style = FlowMeterTypography.CardFooterText.copy(
-                        color = FlowMeterColors.TextSecondary,
-                        fontSize = 12.sp
+                        color = FlowMeterColors.CyanAccent,
+                        fontSize = 11.sp
                     )
                 )
             }
@@ -453,87 +412,27 @@ fun CurrentFlowCard(
 }
 
 /**
- * Summary Metric Card (Home screen).
+ * Interactive Glanceable Metric Card with tap feedback and data type badge.
  */
 @Composable
 fun SummaryMetricCard(
     title: String,
     unit: String,
     icon: @Composable () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    FlowMeterCard(
-        modifier = modifier,
-        cornerRadius = 20.dp
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(FlowMeterColors.DarkBlueIconBg),
-                    contentAlignment = Alignment.Center
-                ) {
-                    icon()
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = title,
-                    style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 14.sp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Text(
-                    text = "—",
-                    style = FlowMeterTypography.MetricPlaceholderMedium
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = unit,
-                    style = FlowMeterTypography.UnitLabel,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "No data yet",
-                style = FlowMeterTypography.CardFooterText.copy(color = FlowMeterColors.TextMuted)
-            )
-        }
-    }
-}
-
-/**
- * Analytics Metric Card with wave graphic, chevron, and calendar footer (2x2 grid).
- */
-@Composable
-fun AnalyticsMetricCard(
-    title: String,
-    unit: String,
-    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    dataType: TelemetryDataType? = null,
+    value: String = "—",
+    subtitle: String = "No data yet",
+    onClick: (() -> Unit)? = null
 ) {
     FlowMeterCard(
         modifier = modifier,
-        cornerRadius = 20.dp
+        cornerRadius = 20.dp,
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Header Row: Icon + Title + Chevron Right
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -558,48 +457,119 @@ fun AnalyticsMetricCard(
                     )
                 }
 
-                ChevronRightIcon(size = 14.dp, tint = FlowMeterColors.TextSecondary)
+                if (dataType != null) {
+                    TelemetryTagChip(type = dataType)
+                } else if (onClick != null) {
+                    ChevronRightIcon(size = 13.dp, tint = FlowMeterColors.TextSecondary)
+                }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Value + Wave Graphic
+            Row(
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = value,
+                    style = FlowMeterTypography.MetricPlaceholderMedium
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = unit,
+                    style = FlowMeterTypography.UnitLabel,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
-                    Text(
-                        text = "—",
-                        style = FlowMeterTypography.MetricPlaceholderMedium.copy(fontSize = 26.sp)
+                Text(
+                    text = subtitle,
+                    style = FlowMeterTypography.CardFooterText.copy(
+                        color = if (onClick != null) FlowMeterColors.CyanAccent else FlowMeterColors.TextMuted,
+                        fontSize = 11.sp
                     )
+                )
+                if (onClick != null && dataType != null) {
+                    ChevronRightIcon(size = 12.dp, tint = FlowMeterColors.TextSecondary)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Detailed Metric Card (for Detail & Research screens).
+ */
+@Composable
+fun DetailMetricCard(
+    title: String,
+    value: String,
+    unit: String = "",
+    subtitle: String = "",
+    icon: @Composable () -> Unit,
+    dataType: TelemetryDataType? = null,
+    modifier: Modifier = Modifier
+) {
+    FlowMeterCard(
+        modifier = modifier,
+        cornerRadius = 18.dp
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(FlowMeterColors.DarkBlueIconBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        icon()
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = unit,
-                        style = FlowMeterTypography.UnitLabel.copy(fontSize = 12.sp)
+                        text = title,
+                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 13.sp)
                     )
                 }
-
-                MetricWaveGraphic(
-                    modifier = Modifier.width(70.dp),
-                    height = 20.dp
-                )
+                if (dataType != null) {
+                    TelemetryTagChip(type = dataType)
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Footer with Calendar Icon
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CalendarIcon(size = 12.dp, tint = FlowMeterColors.TextMuted)
-                Spacer(modifier = Modifier.width(5.dp))
+            Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = "No data yet",
-                    style = FlowMeterTypography.CardFooterText.copy(
-                        color = FlowMeterColors.TextMuted,
-                        fontSize = 11.sp
+                    text = value,
+                    style = FlowMeterTypography.MetricPlaceholderMedium.copy(fontSize = 24.sp)
+                )
+                if (unit.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = unit,
+                        style = FlowMeterTypography.UnitLabel.copy(fontSize = 12.sp),
+                        modifier = Modifier.padding(bottom = 2.dp)
                     )
+                }
+            }
+
+            if (subtitle.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtitle,
+                    style = FlowMeterTypography.CardFooterText.copy(fontSize = 11.sp),
+                    color = FlowMeterColors.TextSecondary
                 )
             }
         }
@@ -607,15 +577,132 @@ fun AnalyticsMetricCard(
 }
 
 /**
- * Total Runtime Card.
+ * Clean Empty Chart Card with customizable title and message.
  */
 @Composable
-fun TotalRuntimeCard(
-    modifier: Modifier = Modifier
+fun EmptyChartCard(
+    title: String,
+    subtitle: String,
+    emptyMessage: String,
+    hint: String,
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    trailing: @Composable () -> Unit = {}
 ) {
     FlowMeterCard(
         modifier = modifier.fillMaxWidth(),
-        cornerRadius = 20.dp
+        cornerRadius = 24.dp
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(FlowMeterColors.DarkBlueIconBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        icon()
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = title,
+                            style = FlowMeterTypography.CardHeaderTitle
+                        )
+                        Text(
+                            text = subtitle,
+                            style = FlowMeterTypography.CardFooterText.copy(fontSize = 11.sp)
+                        )
+                    }
+                }
+                trailing()
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(140.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(FlowMeterColors.DarkBlueAction.copy(alpha = 0.45f))
+                    .border(
+                        width = 1.dp,
+                        color = FlowMeterColors.CardBorderSubtle.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                // Subtle baseline reference line
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    val w = size.width
+                    val h = size.height
+                    val lineY = h * 0.72f
+                    drawLine(
+                        color = Color(0x1A38BDF8),
+                        start = Offset(20.dp.toPx(), lineY),
+                        end = Offset(w - 20.dp.toPx(), lineY),
+                        strokeWidth = 1.dp.toPx()
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(FlowMeterColors.DarkBlueIconBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        icon()
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = emptyMessage,
+                        style = FlowMeterTypography.CardHeaderTitle.copy(
+                            fontSize = 13.sp,
+                            color = FlowMeterColors.TextPrimary
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Text(
+                        text = hint,
+                        style = FlowMeterTypography.CardFooterText.copy(
+                            color = FlowMeterColors.TextSecondary,
+                            fontSize = 11.sp
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Total Runtime / Active Session Card.
+ */
+@Composable
+fun TotalRuntimeCard(
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    FlowMeterCard(
+        modifier = modifier.fillMaxWidth(),
+        cornerRadius = 20.dp,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -635,10 +722,20 @@ fun TotalRuntimeCard(
                     ClockIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent)
                 }
                 Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "Total Runtime",
-                    style = FlowMeterTypography.CardHeaderTitle
-                )
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Runtime & Sessions",
+                            style = FlowMeterTypography.CardHeaderTitle
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        TelemetryTagChip(type = TelemetryDataType.CALCULATED)
+                    }
+                    Text(
+                        text = "Session activity & duration",
+                        style = FlowMeterTypography.CardFooterText.copy(fontSize = 11.sp)
+                    )
+                }
             }
 
             Row(
@@ -646,13 +743,17 @@ fun TotalRuntimeCard(
             ) {
                 Text(
                     text = "—",
-                    style = FlowMeterTypography.MetricPlaceholderMedium.copy(fontSize = 22.sp)
+                    style = FlowMeterTypography.MetricPlaceholderMedium.copy(fontSize = 20.sp)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Hours",
+                    text = "Hrs",
                     style = FlowMeterTypography.UnitLabel
                 )
+                if (onClick != null) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    ChevronRightIcon(size = 14.dp, tint = FlowMeterColors.TextSecondary)
+                }
             }
         }
     }
@@ -690,20 +791,24 @@ fun DeviceConnectionCard(
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    Text(
-                        text = "No device connected",
-                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 15.sp)
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "No device connected",
+                            style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 14.sp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        TelemetryTagChip(type = TelemetryDataType.DEVICE)
+                    }
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Connect your FlowMeter to start receiving live data and insights.",
+                        text = "Connect your FlowMeter hardware to start live telemetry.",
                         style = FlowMeterTypography.CardFooterText.copy(fontSize = 11.sp),
                         lineHeight = 15.sp
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             ConnectButton(onClick = onConnectClick)
         }
@@ -718,113 +823,15 @@ fun WaterUsageChartCard(
     modifier: Modifier = Modifier,
     dateRangeText: String = "Last 7 days"
 ) {
-    FlowMeterCard(
-        modifier = modifier.fillMaxWidth(),
-        cornerRadius = 24.dp
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Header Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(34.dp)
-                            .clip(CircleShape)
-                            .background(FlowMeterColors.DarkBlueIconBg),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AnalyticsNavIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent)
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Column {
-                        Text(
-                            text = "Water Usage",
-                            style = FlowMeterTypography.CardHeaderTitle
-                        )
-                        Text(
-                            text = "Total consumption over time",
-                            style = FlowMeterTypography.CardFooterText.copy(fontSize = 11.sp)
-                        )
-                    }
-                }
-
-                DateDropdownChip(text = dateRangeText)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Deliberate Empty Chart Container
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(FlowMeterColors.DarkBlueAction.copy(alpha = 0.45f))
-                    .border(
-                        width = 1.dp,
-                        color = FlowMeterColors.CardBorderSubtle.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(16.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                // Subtle baseline reference line
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    val w = size.width
-                    val h = size.height
-                    val lineY = h * 0.72f
-                    drawLine(
-                        color = Color(0x1A38BDF8),
-                        start = Offset(20.dp.toPx(), lineY),
-                        end = Offset(w - 20.dp.toPx(), lineY),
-                        strokeWidth = 1.dp.toPx()
-                    )
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(CircleShape)
-                            .background(FlowMeterColors.DarkBlueIconBg),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AnalyticsNavIcon(size = 20.dp, tint = FlowMeterColors.CyanAccent)
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Text(
-                        text = "No data available",
-                        style = FlowMeterTypography.CardHeaderTitle.copy(
-                            fontSize = 14.sp,
-                            color = FlowMeterColors.TextPrimary
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(3.dp))
-
-                    Text(
-                        text = "Connect your device to view usage trends",
-                        style = FlowMeterTypography.CardFooterText.copy(
-                            color = FlowMeterColors.TextSecondary,
-                            fontSize = 12.sp
-                        )
-                    )
-                }
-            }
-        }
-    }
+    EmptyChartCard(
+        title = "Water Usage",
+        subtitle = "Total consumption over time",
+        emptyMessage = "No data available",
+        hint = "Connect your device to view usage trends",
+        icon = { AnalyticsNavIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
+        modifier = modifier,
+        trailing = { DateDropdownChip(text = dateRangeText) }
+    )
 }
 
 /**
@@ -1019,7 +1026,7 @@ private fun DistributionLegendRow(
 }
 
 /**
- * Main Status Card on Alerts screen with concentric glowing shield and serene water waves.
+ * Main Status Card on Alerts screen with concentric glowing shield.
  */
 @Composable
 fun MainAlertStatusCard(
@@ -1092,7 +1099,7 @@ fun MainAlertStatusCard(
                 }
 
                 // Shield Icon in center
-                com.arnav.flowmeter.components.icons.ShieldCheckIcon(
+                ShieldCheckIcon(
                     size = 38.dp,
                     tint = FlowMeterColors.CyanAccent
                 )
@@ -1148,7 +1155,6 @@ fun RecentAlertsCard(
     onViewAllClick: () -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        // Section Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -1157,7 +1163,7 @@ fun RecentAlertsCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Recent Alerts",
+                text = "Alert Categories",
                 style = FlowMeterTypography.GreetingName.copy(fontSize = 18.sp)
             )
 
@@ -1169,10 +1175,10 @@ fun RecentAlertsCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "View all",
+                    text = "Diagnostics",
                     style = FlowMeterTypography.CardFooterText.copy(
                         color = FlowMeterColors.CyanAccent,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 13.sp
                     )
                 )
@@ -1183,7 +1189,6 @@ fun RecentAlertsCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // List Container Card
         FlowMeterCard(
             modifier = Modifier.fillMaxWidth(),
             cornerRadius = 22.dp
@@ -1191,26 +1196,30 @@ fun RecentAlertsCard(
             Column(modifier = Modifier.fillMaxWidth()) {
                 AlertCategoryRow(
                     icon = { WaterDropIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
-                    title = "No alerts yet",
-                    subtitle = "You'll see high usage alerts here"
+                    title = "High Volume & Leak Alerts",
+                    subtitle = "No active leak detected",
+                    dataType = TelemetryDataType.CALCULATED
                 )
                 AlertDivider()
                 AlertCategoryRow(
-                    icon = { com.arnav.flowmeter.components.icons.TrendingFlowIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
-                    title = "No alerts yet",
-                    subtitle = "You'll see unusual flow alerts here"
+                    icon = { TrendingFlowIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
+                    title = "Unusual Flow Rate",
+                    subtitle = "Within normal thresholds",
+                    dataType = TelemetryDataType.MEASURED
                 )
                 AlertDivider()
                 AlertCategoryRow(
                     icon = { DeviceSensorIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
-                    title = "No alerts yet",
-                    subtitle = "You'll see device alerts here"
+                    title = "Device & Battery State",
+                    subtitle = "No hardware faults reported",
+                    dataType = TelemetryDataType.DEVICE
                 )
                 AlertDivider()
                 AlertCategoryRow(
-                    icon = { com.arnav.flowmeter.components.icons.ThermometerIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
-                    title = "No alerts yet",
-                    subtitle = "You'll see temperature alerts here"
+                    icon = { ThermometerIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) },
+                    title = "Thermal & Pressure Bounds",
+                    subtitle = "Operating environment nominal",
+                    dataType = TelemetryDataType.QUALITY
                 )
             }
         }
@@ -1222,6 +1231,7 @@ private fun AlertCategoryRow(
     icon: @Composable () -> Unit,
     title: String,
     subtitle: String,
+    dataType: TelemetryDataType? = null,
     onClick: () -> Unit = {}
 ) {
     Row(
@@ -1266,7 +1276,11 @@ private fun AlertCategoryRow(
             }
         }
 
-        ChevronRightIcon(size = 14.dp, tint = FlowMeterColors.TextSecondary)
+        if (dataType != null) {
+            TelemetryTagChip(type = dataType)
+        } else {
+            ChevronRightIcon(size = 14.dp, tint = FlowMeterColors.TextSecondary)
+        }
     }
 }
 
@@ -1282,47 +1296,97 @@ private fun AlertDivider() {
 }
 
 /**
- * Bottom Information Card about future alerts.
+ * Telemetry Section Card and Register Row for Deep Telemetry & Research.
  */
 @Composable
-fun AlertInfoCard(
-    modifier: Modifier = Modifier
+fun TelemetrySectionCard(
+    title: String,
+    icon: @Composable () -> Unit,
+    dataType: TelemetryDataType,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
 ) {
     FlowMeterCard(
         modifier = modifier.fillMaxWidth(),
         cornerRadius = 20.dp
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(CircleShape)
-                    .background(FlowMeterColors.DarkBlueIconBg),
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                com.arnav.flowmeter.components.icons.LightbulbIcon(
-                    size = 20.dp,
-                    tint = FlowMeterColors.CyanAccent
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(FlowMeterColors.DarkBlueIconBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        icon()
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = title,
+                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 15.sp)
+                    )
+                }
+
+                TelemetryTagChip(type = dataType)
             }
 
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "You'll get alerts for",
-                    style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 14.sp)
+            content()
+        }
+    }
+}
+
+@Composable
+fun TelemetryRegisterRow(
+    label: String,
+    value: String,
+    unit: String = "",
+    tag: TelemetryDataType? = null
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = label,
+                style = FlowMeterTypography.CardFooterText.copy(
+                    fontSize = 12.sp,
+                    color = FlowMeterColors.TextSecondary
                 )
-                Spacer(modifier = Modifier.height(3.dp))
+            )
+            if (tag != null) {
+                Spacer(modifier = Modifier.width(6.dp))
+                TelemetryTagChip(type = tag)
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = value,
+                style = FlowMeterTypography.CardHeaderTitle.copy(
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = FlowMeterColors.TextPrimary
+                )
+            )
+            if (unit.isNotEmpty()) {
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "High flow, unusual usage, device issues and more once your device is connected.",
+                    text = unit,
                     style = FlowMeterTypography.CardFooterText.copy(
                         fontSize = 11.sp,
-                        color = FlowMeterColors.TextSecondary,
-                        lineHeight = 15.sp
+                        color = FlowMeterColors.TextMuted
                     )
                 )
             }
@@ -1330,3 +1394,13 @@ fun AlertInfoCard(
     }
 }
 
+@Composable
+fun TelemetryRowDivider() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 3.dp)
+            .height(1.dp)
+            .background(Color(0x1438BDF8))
+    )
+}
