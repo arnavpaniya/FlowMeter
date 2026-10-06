@@ -47,9 +47,9 @@ enum class NavigationTab(val title: String) {
 }
 
 /**
- * High-fidelity Claymorphic Floating Bottom Navigation Bar.
- * Completely opaque with soft 3D inflated pill aesthetic, inner bevel highlights,
- * tactile active tab pill, and background fade scrim to eliminate content bleed-through.
+ * High-fidelity Floating Pill Navigation Bar.
+ * Floats gracefully above the bottom navigation/gesture area with dark navy surface,
+ * subtle blue border, restrained glow, and refined active tab illumination.
  */
 @Composable
 fun FloatingBottomNavBar(
@@ -65,51 +65,51 @@ fun FloatingBottomNavBar(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        FlowMeterColors.BackgroundDark.copy(alpha = 0.75f),
+                        FlowMeterColors.BackgroundDark.copy(alpha = 0.80f),
                         FlowMeterColors.BackgroundDark.copy(alpha = 0.98f)
                     )
                 )
             )
-            .padding(horizontal = 20.dp)
-            .padding(top = 10.dp, bottom = 12.dp)
+            .padding(horizontal = 24.dp)
+            .padding(top = 8.dp, bottom = 14.dp)
     ) {
-        // Claymorphic Pill Shell
+        // Floating Pill Shell
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                // Deep ambient 3D drop shadow
+                // Ambient 3D drop shadow
                 .shadow(
-                    elevation = 22.dp,
+                    elevation = 16.dp,
                     shape = CircleShape,
-                    spotColor = Color(0xE6000000),
-                    ambientColor = Color(0x99000000)
+                    spotColor = Color(0xCC000000),
+                    ambientColor = Color(0x66000000)
                 )
-                // Secondary cyan glow shadow for clay depth
+                // Soft blue glow shadow
                 .shadow(
-                    elevation = 10.dp,
+                    elevation = 6.dp,
                     shape = CircleShape,
-                    spotColor = FlowMeterColors.ElectricBlue.copy(alpha = 0.35f),
-                    ambientColor = FlowMeterColors.CyanAccent.copy(alpha = 0.2f)
+                    spotColor = FlowMeterColors.ElectricBlue.copy(alpha = 0.22f),
+                    ambientColor = FlowMeterColors.CyanAccent.copy(alpha = 0.12f)
                 )
                 .clip(CircleShape)
-                // Solid Opaque Clay Background Gradient
+                // Solid Opaque Dark Navy Background
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFF17243A),
-                            Color(0xFF10192A),
-                            Color(0xFF0C1322)
+                            Color(0xFF141F32),
+                            Color(0xFF0F1728),
+                            Color(0xFF0B111E)
                         )
                     )
                 )
-                // Outer Bevel Highlight Border
+                // Subtle blue border
                 .border(
-                    width = 1.2.dp,
+                    width = 1.dp,
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0x807DD3FC), // Top illuminated rim
-                            Color(0x3300A3FF),
-                            Color(0x1F000000)  // Bottom darker bevel
+                            Color(0x6638BDF8), // Top subtle highlight rim
+                            Color(0x2900A3FF),
+                            Color(0x14000000)
                         )
                     ),
                     shape = CircleShape
@@ -123,7 +123,7 @@ fun FloatingBottomNavBar(
             ) {
                 NavigationTab.values().forEach { tab ->
                     val isSelected = tab == selectedTab
-                    ClayNavBarItem(
+                    FloatingNavBarItem(
                         tab = tab,
                         isSelected = isSelected,
                         onClick = { onTabSelected(tab) }
@@ -135,10 +135,10 @@ fun FloatingBottomNavBar(
 }
 
 /**
- * Tactile inflated Claymorphic navigation item.
+ * Refined floating navigation item with restrained active illumination.
  */
 @Composable
-private fun ClayNavBarItem(
+private fun FloatingNavBarItem(
     tab: NavigationTab,
     isSelected: Boolean,
     onClick: () -> Unit
@@ -149,45 +149,43 @@ private fun ClayNavBarItem(
     )
 
     val elevation by animateDpAsState(
-        targetValue = if (isSelected) 8.dp else 0.dp,
+        targetValue = if (isSelected) 4.dp else 0.dp,
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "nav_item_elevation"
     )
 
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .then(
                 if (isSelected) {
                     Modifier
-                        // Inflated 3D tactile button shadow
                         .shadow(
                             elevation = elevation,
-                            shape = RoundedCornerShape(24.dp),
-                            spotColor = FlowMeterColors.ElectricBlue.copy(alpha = 0.6f),
-                            ambientColor = FlowMeterColors.ElectricBlue.copy(alpha = 0.4f)
+                            shape = RoundedCornerShape(20.dp),
+                            spotColor = FlowMeterColors.ElectricBlue.copy(alpha = 0.35f),
+                            ambientColor = FlowMeterColors.CyanAccent.copy(alpha = 0.20f)
                         )
-                        // Active Clay Gradient (Solid, vibrant, volumetric)
+                        // Restrained active blue pill gradient
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color(0xFF0284C7),
-                                    Color(0xFF0091EA),
-                                    Color(0xFF0077D4)
+                                    Color(0xFF0D5499),
+                                    Color(0xFF0A4078),
+                                    Color(0xFF083260)
                                 )
                             )
                         )
-                        // Top inner bevel highlight
                         .border(
                             width = 1.dp,
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color(0x99FFFFFF), // Top edge highlight
-                                    Color(0x4038BDF8),
-                                    Color(0x00000000)
+                                    Color(0x667DD3FC),
+                                    Color(0x2638BDF8),
+                                    Color.Transparent
                                 )
                             ),
-                            shape = RoundedCornerShape(24.dp)
+                            shape = RoundedCornerShape(20.dp)
                         )
                 } else {
                     Modifier
@@ -195,10 +193,10 @@ private fun ClayNavBarItem(
             )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(bounded = true, color = FlowMeterColors.CyanAccent.copy(alpha = 0.25f)),
+                indication = ripple(bounded = true, color = FlowMeterColors.CyanAccent.copy(alpha = 0.2f)),
                 onClick = onClick
             )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 14.dp, vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -206,20 +204,20 @@ private fun ClayNavBarItem(
         ) {
             when (tab) {
                 NavigationTab.HOME -> HomeNavIcon(
-                    size = 20.dp,
+                    size = 19.dp,
                     tint = tint
                 )
                 NavigationTab.ANALYTICS -> AnalyticsNavIcon(
-                    size = 20.dp,
+                    size = 19.dp,
                     tint = tint
                 )
                 NavigationTab.ALERTS -> BellIcon(
-                    size = 20.dp,
+                    size = 19.dp,
                     tint = tint,
                     hasNotificationDot = (tab == NavigationTab.ALERTS && !isSelected)
                 )
                 NavigationTab.SETTINGS -> SettingsGearIcon(
-                    size = 20.dp,
+                    size = 19.dp,
                     tint = tint
                 )
             }

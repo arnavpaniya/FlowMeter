@@ -244,7 +244,7 @@ fun MetricWaveGraphic(
 @Composable
 fun CircularFlowGauge(
     modifier: Modifier = Modifier,
-    size: Dp = 190.dp
+    size: Dp = 160.dp
 ) {
     Box(
         modifier = modifier.size(size),
@@ -254,7 +254,7 @@ fun CircularFlowGauge(
             val w = this.size.width
             val h = this.size.height
             val center = Offset(w / 2f, h / 2f)
-            val radius = (w / 2f) - 20.dp.toPx()
+            val radius = (w / 2f) - 16.dp.toPx()
 
             drawArc(
                 brush = Brush.sweepGradient(
@@ -270,10 +270,10 @@ fun CircularFlowGauge(
                 useCenter = false,
                 topLeft = Offset(center.x - radius, center.y - radius),
                 size = Size(radius * 2, radius * 2),
-                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
+                style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
             )
 
-            val totalTicks = 44
+            val totalTicks = 40
             val startAngle = 140.0
             val sweepAngle = 260.0
             val step = sweepAngle / (totalTicks - 1)
@@ -282,12 +282,12 @@ fun CircularFlowGauge(
                 val currentAngleDeg = startAngle + (i * step)
                 val currentAngleRad = Math.toRadians(currentAngleDeg)
 
-                val tickLength = if (i % 5 == 0) 12.dp.toPx() else 7.dp.toPx()
-                val tickWidth = if (i % 5 == 0) 2.dp.toPx() else 1.2.dp.toPx()
-                val tickAlpha = if (i % 5 == 0) 0.85f else 0.45f
+                val tickLength = if (i % 5 == 0) 10.dp.toPx() else 6.dp.toPx()
+                val tickWidth = if (i % 5 == 0) 1.8.dp.toPx() else 1.dp.toPx()
+                val tickAlpha = if (i % 5 == 0) 0.80f else 0.40f
 
-                val innerRadius = radius - 6.dp.toPx() - tickLength
-                val outerRadius = radius - 6.dp.toPx()
+                val innerRadius = radius - 5.dp.toPx() - tickLength
+                val outerRadius = radius - 5.dp.toPx()
 
                 val startX = (center.x + innerRadius * cos(currentAngleRad)).toFloat()
                 val startY = (center.y + innerRadius * sin(currentAngleRad)).toFloat()
@@ -309,7 +309,7 @@ fun CircularFlowGauge(
         ) {
             Text(
                 text = "—",
-                style = FlowMeterTypography.MetricPlaceholderLarge.copy(fontSize = 44.sp)
+                style = FlowMeterTypography.MetricPlaceholderLarge.copy(fontSize = 38.sp)
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
@@ -365,7 +365,7 @@ fun DateDropdownChip(
 }
 
 /**
- * Main Current-Flow Card matching reference layout.
+ * Main Current-Flow Card matching reference layout with compact intentional empty state.
  */
 @Composable
 fun CurrentFlowCard(
@@ -417,23 +417,16 @@ fun CurrentFlowCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularFlowGauge(size = 190.dp)
+                CircularFlowGauge(size = 160.dp)
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            CardAmbientWaveOverlay(
-                modifier = Modifier.fillMaxWidth(),
-                height = 40.dp
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -441,12 +434,18 @@ fun CurrentFlowCard(
             ) {
                 Text(
                     text = "No live data available",
-                    style = FlowMeterTypography.CardFooterText.copy(color = FlowMeterColors.TextPrimary)
+                    style = FlowMeterTypography.CardFooterText.copy(
+                        color = FlowMeterColors.TextPrimary,
+                        fontSize = 13.sp
+                    )
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "Connect your device to start monitoring",
-                    style = FlowMeterTypography.CardFooterText.copy(color = FlowMeterColors.TextSecondary)
+                    style = FlowMeterTypography.CardFooterText.copy(
+                        color = FlowMeterColors.TextSecondary,
+                        fontSize = 12.sp
+                    )
                 )
             }
         }
@@ -712,7 +711,7 @@ fun DeviceConnectionCard(
 }
 
 /**
- * Water Usage Chart Card with coordinate grid and empty state placeholder.
+ * Water Usage Chart Card with deliberate clean empty state.
  */
 @Composable
 fun WaterUsageChartCard(
@@ -760,105 +759,66 @@ fun WaterUsageChartCard(
                 DateDropdownChip(text = dateRangeText)
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Chart area with grid and empty state overlay
+            // Deliberate Empty Chart Container
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(150.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(FlowMeterColors.DarkBlueAction.copy(alpha = 0.45f))
+                    .border(
+                        width = 1.dp,
+                        color = FlowMeterColors.CardBorderSubtle.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                // Background grid lines + Axis labels
+                // Subtle baseline reference line
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val w = size.width
                     val h = size.height
-                    val leftPadding = 30.dp.toPx()
-                    val bottomPadding = 24.dp.toPx()
-                    val chartWidth = w - leftPadding
-                    val chartHeight = h - bottomPadding
-
-                    val gridColor = Color(0x1438BDF8)
-                    val strokeW = 1.dp.toPx()
-
-                    // Horizontal grid lines (5 lines for 0, 25, 50, 75, 100)
-                    for (i in 0..4) {
-                        val y = (chartHeight / 4f) * i
-                        drawLine(
-                            color = gridColor,
-                            start = Offset(leftPadding, y),
-                            end = Offset(w, y),
-                            strokeWidth = strokeW
-                        )
-                    }
-
-                    // Vertical grid lines (7 lines for 7 days)
-                    for (i in 0..6) {
-                        val x = leftPadding + (chartWidth / 6f) * i
-                        drawLine(
-                            color = gridColor,
-                            start = Offset(x, 0f),
-                            end = Offset(x, chartHeight),
-                            strokeWidth = strokeW
-                        )
-                    }
+                    val lineY = h * 0.72f
+                    drawLine(
+                        color = Color(0x1A38BDF8),
+                        start = Offset(20.dp.toPx(), lineY),
+                        end = Offset(w - 20.dp.toPx(), lineY),
+                        strokeWidth = 1.dp.toPx()
+                    )
                 }
 
-                // Y-axis labels
                 Column(
-                    modifier = Modifier
-                        .height(156.dp)
-                        .padding(start = 2.dp),
-                    verticalArrangement = Arrangement.SpaceBetween
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 24.dp)
                 ) {
-                    listOf("100", "75", "50", "25", "0").forEach { label ->
-                        Text(
-                            text = label,
-                            style = FlowMeterTypography.CardFooterText.copy(
-                                color = FlowMeterColors.TextMuted,
-                                fontSize = 9.sp
-                            )
-                        )
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(FlowMeterColors.DarkBlueIconBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AnalyticsNavIcon(size = 20.dp, tint = FlowMeterColors.CyanAccent)
                     }
-                }
 
-                // X-axis labels
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomEnd)
-                        .padding(start = 32.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    listOf("Oct 1", "Oct 2", "Oct 3", "Oct 4", "Oct 5", "Oct 6", "Oct 7").forEach { day ->
-                        Text(
-                            text = day,
-                            style = FlowMeterTypography.CardFooterText.copy(
-                                color = FlowMeterColors.TextMuted,
-                                fontSize = 9.sp
-                            )
-                        )
-                    }
-                }
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                // Center Empty State Message
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(bottom = 12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    AnalyticsNavIcon(size = 28.dp, tint = FlowMeterColors.CyanAccent)
-                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "No data available",
-                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 13.sp)
+                        style = FlowMeterTypography.CardHeaderTitle.copy(
+                            fontSize = 14.sp,
+                            color = FlowMeterColors.TextPrimary
+                        )
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Spacer(modifier = Modifier.height(3.dp))
+
                     Text(
                         text = "Connect your device to view usage trends",
                         style = FlowMeterTypography.CardFooterText.copy(
                             color = FlowMeterColors.TextSecondary,
-                            fontSize = 11.sp
+                            fontSize = 12.sp
                         )
                     )
                 }
