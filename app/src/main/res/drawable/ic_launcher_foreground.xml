@@ -1,8 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:width="72dp"
-        android:height="72dp"
-        android:gravity="center"
-        android:drawable="@drawable/flowmeter_logo" />
-</layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Soft Drop Shadow Under Droplet -->
+    <path
+        android:pathData="M54,32 C54,32 72.5,52 72.5,62 C72.5,72 64.2,80 54,80 C43.8,80 35.5,72 35.5,62 C35.5,52 54,32 54,32 Z"
+        android:fillColor="#33001845" />
+
+    <!-- Top Water Droplet Body -->
+    <path
+        android:pathData="M54,28 C54,28 73,50 73,61 C73,63.5 72.2,65.8 70.8,67.8 C66.5,63.2 59.8,62.8 54,66 C47.5,69.5 41.2,68 37.2,67.8 C35.8,65.8 35,63.5 35,61 C35,50 54,28 54,28 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="28"
+                android:endX="54"
+                android:endY="68"
+                android:type="linear">
+                <item
+                    android:color="#FFFFFF"
+                    android:offset="0.0" />
+                <item
+                    android:color="#E0F2FE"
+                    android:offset="0.65" />
+                <item
+                    android:color="#BAE6FD"
+                    android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Bottom Flowing Wave Segment -->
+    <path
+        android:pathData="M38.2,71.2 C42.2,71.5 48,73 54,69.5 C60.5,66 66.8,66.8 69.8,71.2 C66.5,76.5 60.6,80 54,80 C47.4,80 41.5,76.5 38.2,71.2 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="66"
+                android:endX="54"
+                android:endY="80"
+                android:type="linear">
+                <item
+                    android:color="#E0F2FE"
+                    android:offset="0.0" />
+                <item
+                    android:color="#7DD3FC"
+                    android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+</vector>
