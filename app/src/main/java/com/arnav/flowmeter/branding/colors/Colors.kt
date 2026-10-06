@@ -1,9 +1,13 @@
 package com.arnav.flowmeter.branding.colors
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 object FlowMeterColors {
+    val CardShape = RoundedCornerShape(20.dp)
+    val DividerDark = Color(0x1A38BDF8)
     // Backgrounds
     val BackgroundDark = Color(0xFF090D16)
     val BackgroundNavy = Color(0xFF0B101D)

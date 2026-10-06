@@ -101,4 +101,12 @@ object FlowMeterTypography {
         letterSpacing = 0.2.sp,
         color = FlowMeterColors.TextPrimary
     )
+
+    val CardSectionTitle = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 12.sp,
+        letterSpacing = 1.2.sp,
+        color = FlowMeterColors.TextSecondary
+    )
 }

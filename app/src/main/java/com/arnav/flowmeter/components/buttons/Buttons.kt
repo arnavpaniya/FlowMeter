@@ -164,3 +164,34 @@ fun TimeRangeSelector(
         }
     }
 }
+
+@Composable
+fun PrimaryActionButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = FlowMeterColors.ElectricBlue,
+                ambientColor = FlowMeterColors.ElectricBlue
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .background(FlowMeterColors.ConnectButtonBrush)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(color = Color.White.copy(alpha = 0.3f)),
+                onClick = onClick
+            )
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            style = FlowMeterTypography.ButtonText
+        )
+    }
+}

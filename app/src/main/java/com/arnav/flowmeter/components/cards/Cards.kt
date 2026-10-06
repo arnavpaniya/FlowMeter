@@ -1404,3 +1404,40 @@ fun TelemetryRowDivider() {
             .background(Color(0x1438BDF8))
     )
 }
+
+@Composable
+fun AlertInfoCard(
+    modifier: Modifier = Modifier
+) {
+    FlowMeterCard(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(FlowMeterColors.DarkBlueAction),
+                contentAlignment = Alignment.Center
+            ) {
+                com.arnav.flowmeter.components.icons.InfoCircleIcon(size = 20.dp, tint = FlowMeterColors.CyanAccent)
+            }
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Smart Alert Thresholds",
+                    style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 14.sp)
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "FlowMeter continuously monitors real-time telemetry for pressure drops, flow anomalies, and sensor calibration drifts.",
+                    style = FlowMeterTypography.CardFooterText,
+                    color = FlowMeterColors.TextSecondary
+                )
+            }
+        }
+    }
+}
