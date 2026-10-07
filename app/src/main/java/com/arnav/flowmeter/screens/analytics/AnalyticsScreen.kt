@@ -78,11 +78,11 @@ fun AnalyticsScreen(
                 .statusBarsPadding()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 150.dp) // Generous clearance for floating bottom navigation
+                .padding(bottom = 150.dp)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // 1. TOP HEADER: Brand Logo + Action Buttons (Unobstructed)
+            // 1. TOP HEADER: Brand Logo + Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -125,7 +125,7 @@ fun AnalyticsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // 2. MAIN TITLE
             Column(
@@ -142,17 +142,23 @@ fun AnalyticsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // 3. ATMOSPHERIC FLOWING WAVE
             HeaderAtmosphericWaves(
                 modifier = Modifier.fillMaxWidth(),
-                height = 30.dp
+                height = 28.dp
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // 4. TIME RANGE SELECTOR PILLS
+            // SECTION: TREND ANALYSIS
+            Text(
+                text = "TREND ANALYSIS",
+                style = FlowMeterTypography.CardSectionTitle,
+                color = FlowMeterColors.TextSecondary
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
             TimeRangeSelector(
                 options = timeRangeOptions,
                 selectedIndex = selectedTimeRangeIndex,
@@ -161,7 +167,6 @@ fun AnalyticsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 5. MAIN WATER USAGE CHART CARD
             WaterUsageChartCard(
                 dateRangeText = when (selectedTimeRangeIndex) {
                     0 -> "Last 7 days"
@@ -171,9 +176,8 @@ fun AnalyticsScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 6. FLOW RATE DYNAMICS TREND CARD (Clickable to FlowDetail)
             EmptyChartCard(
                 title = "Flow Velocity Trends",
                 subtitle = "Historical flow rate envelope",
@@ -182,12 +186,19 @@ fun AnalyticsScreen(
                 icon = { TrendingFlowIcon(size = 18.dp, tint = FlowMeterColors.CyanAccent) }
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // 7. SUMMARY STATISTICS (2x2 Grid)
+            // SECTION: PERFORMANCE STATISTICS
+            Text(
+                text = "PERFORMANCE STATISTICS",
+                style = FlowMeterTypography.CardSectionTitle,
+                color = FlowMeterColors.TextSecondary
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 DetailMetricCard(
                     title = "Avg Daily Usage",
@@ -210,11 +221,11 @@ fun AnalyticsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 DetailMetricCard(
                     title = "Total Sessions",
@@ -236,14 +247,20 @@ fun AnalyticsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 8. USAGE DISTRIBUTION CARD
             UsageDistributionCard()
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // 9. DEEP TELEMETRY & SESSIONS ENTRY POINT CARD
+            // SECTION: ADVANCED LOGS
+            Text(
+                text = "ADVANCED LOGS",
+                style = FlowMeterTypography.CardSectionTitle,
+                color = FlowMeterColors.TextSecondary
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
             FlowMeterCard(
                 modifier = Modifier
                     .fillMaxWidth()

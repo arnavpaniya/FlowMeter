@@ -70,17 +70,16 @@ fun HomeScreen(
                 .statusBarsPadding()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 150.dp) // Generous clearance for floating bottom navigation bar
+                .padding(bottom = 150.dp)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // 1. TOP HEADER: Logo + Wordmark & Action Controls (Clear, unobstructed)
+            // 1. TOP HEADER: Logo + Wordmark & Action Controls
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // FlowMeter Logo + Brand Title
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -95,7 +94,6 @@ fun HomeScreen(
                     )
                 }
 
-                // Right Actions: Notification Bell & Settings Gear
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -113,7 +111,7 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // 2. GREETING / TITLE SECTION
             Column(
@@ -135,27 +133,40 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // 3. ATMOSPHERIC FLOWING WAVE (Elegantly placed between greeting and content)
             HeaderAtmosphericWaves(
                 modifier = Modifier.fillMaxWidth(),
-                height = 30.dp
+                height = 28.dp
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // 4. MAIN CURRENT FLOW CARD (Glanceable Gauge + Tap to Flow Detail)
+            // SECTION: REAL-TIME MONITORING
+            Text(
+                text = "REAL-TIME MONITORING",
+                style = FlowMeterTypography.CardSectionTitle,
+                color = FlowMeterColors.TextSecondary
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
             CurrentFlowCard(
                 onClick = onFlowDetailClick
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // 5. SUMMARY METRIC CARDS (Today's Usage & Average Flow with tap-to-detail)
+            // SECTION: METRICS & RUNTIME
+            Text(
+                text = "METRICS & RUNTIME",
+                style = FlowMeterTypography.CardSectionTitle,
+                color = FlowMeterColors.TextSecondary
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 SummaryMetricCard(
                     title = "Today's Usage",
@@ -178,23 +189,28 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 6. TOTAL RUNTIME & SESSIONS CARD (Tap to Session Detail)
             TotalRuntimeCard(
                 onClick = onSessionDetailClick
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // 7. DEVICE CONNECTION CARD (Tap to Device Health)
+            // SECTION: SYSTEM & HARDWARE
+            Text(
+                text = "SYSTEM & HARDWARE",
+                style = FlowMeterTypography.CardSectionTitle,
+                color = FlowMeterColors.TextSecondary
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
             DeviceConnectionCard(
                 onConnectClick = onDeviceHealthClick
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 8. TELEMETRY & RESEARCH QUICK ACCESS CARD
             FlowMeterCard(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -436,10 +437,11 @@ fun SummaryMetricCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
                 ) {
                     Box(
                         modifier = Modifier
@@ -453,7 +455,9 @@ fun SummaryMetricCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = title,
-                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 13.sp)
+                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 12.sp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -524,9 +528,12 @@ fun DetailMetricCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Box(
                         modifier = Modifier
                             .size(28.dp)
@@ -539,7 +546,9 @@ fun DetailMetricCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = title,
-                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 13.sp)
+                        style = FlowMeterTypography.CardHeaderTitle.copy(fontSize = 12.sp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 if (dataType != null) {

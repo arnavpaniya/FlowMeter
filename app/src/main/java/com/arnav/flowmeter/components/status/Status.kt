@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +62,7 @@ fun TelemetryTagChip(
 ) {
     Box(
         modifier = modifier
+            .wrapContentWidth(unbounded = true)
             .clip(RoundedCornerShape(6.dp))
             .background(type.color.copy(alpha = 0.12f))
             .border(
@@ -73,6 +75,8 @@ fun TelemetryTagChip(
     ) {
         Text(
             text = type.tag,
+            maxLines = 1,
+            softWrap = false,
             style = FlowMeterTypography.CardFooterText.copy(
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
